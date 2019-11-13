@@ -27,6 +27,12 @@ head(stuff$text)
 
 harvard_timeline <- get_timeline("Harvard", n = 3200)
 
+
+
+
+
+df <- cbind(1:length(tweets),0)
+
 #built in ggplot function that creates frequency of tweets over specified interval of time
 ts_plot(harvard_timeline)
 
@@ -43,10 +49,24 @@ hockey <- get_timeline("NCAAIceHockey") %>%
 
 head(hockey$text)
 
+g <- stuff$text[2]
+
+#grep returns 1, 0 to see if vector is in other vector
+grep("hockey", g) #is hockey in g 
+
+for(i in 1:length(unis)){storage[[i]]} <- (grep(unis[i],g))
+
+
+#is the id in the grep function, and if it is then add 1
+
+df[is.element(df$id,grep(unis[i],g)),"index"] <- df[is.element(df$id,grep(unis[i],g)),"index"]+1
+
+#google for baby names.csv, see if codes for gender? 
+
 ##get r to recognize names - use census data? 
 
 
 ## what i need to do:
 #if Harvard: find way to narrow down to just sports tweets
 #both: extract names from text, if name not in text find way to code for gender, then use gender package 
-##to code for gender
+#to code for gender
