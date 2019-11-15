@@ -28,11 +28,6 @@ head(stuff$text)
 harvard_timeline <- get_timeline("Harvard", n = 3200)
 
 
-
-
-
-df <- cbind(1:length(tweets),0)
-
 #built in ggplot function that creates frequency of tweets over specified interval of time
 ts_plot(harvard_timeline)
 
@@ -59,6 +54,7 @@ for(i in 1:length(unis)){storage[[i]]} <- (grep(unis[i],g))
 
 #is the id in the grep function, and if it is then add 1
 
+df <- cbind(1:length(tweets),0)
 df[is.element(df$id,grep(unis[i],g)),"index"] <- df[is.element(df$id,grep(unis[i],g)),"index"]+1
 
 #google for baby names.csv, see if codes for gender? 
