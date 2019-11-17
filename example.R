@@ -8,7 +8,7 @@ get_token()
 
 data("babynames")
 
-hockey <- get_timeline("NCAAIceHockey", n = 10) 
+hockey <- get_timeline("NCAAIceHockey", n = 100) 
   
 #gsub says pattern, replacement, x 
 #use mutate
@@ -44,20 +44,12 @@ joined_babynames_tweets <- cleaned_hockey %>%
 
 
 
-grep(names[i], hockey_cleaned$word)
-
-for(i in 1:length(names)){storage[[i]]} <- (grep(names[i],hockey_cleaned$word))
-
-[is.element(df$id,grep(unis[i],g)),"index"] <- df[is.element(df$id,grep(unis[i],g)),"index"]+1
-
-
 #grepl returns logical vector of pattern 
 grepl("eric", hockey_cleaned$word)
 
 
 
-example <- babynames %>% 
-  grep("Anna", name)
+#check out dillon's shiny, do page of models? - model for each NCAA twitter, does gender predict tweet frequency? 
 
 
 
