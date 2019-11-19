@@ -50,7 +50,7 @@ server <- function(input, output) {
            y = "Count of names mentioned per Tweet",
            x = "Distinct Tweets")
   })
-    
+      
 }
 
         
