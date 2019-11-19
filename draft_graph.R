@@ -49,3 +49,8 @@ draft <- joined_babynames_tweets %>%
        caption = "Gender assumed by names mentioned in individual Tweet",
        y = "Count of names mentioned per Tweet",
        x = "Distinct Tweets")
+
+#cleaned data directory
+dir.create("cleaned_data")
+write_rds(joined_babynames_tweets, "cleaned_data/joined_babynames_hckytweets.rds")
+file.copy("cleaned_data/joined_babynames_hckytweets.rds", "shiny_files/joined_babynames_hckytweets.rds")
