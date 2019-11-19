@@ -58,7 +58,7 @@ joined_babynames_tweets %>%
 
 #save joined_babynames_tweets as rds
 dir.create("cleaned_data")
-write_rds(joined_babynames_tweets, "cleaned_data/joined_babynames_hckytweets.rds"
+write_rds(joined_babynames_tweets, "cleaned_data/joined_babynames_hckytweets.rds")
         
 
 
