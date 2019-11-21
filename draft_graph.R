@@ -38,7 +38,7 @@ joined_babynames_tweets <- cleaned_hockey %>%
 
 #graph 
 
-draft <- joined_babynames_tweets %>% 
+joined_babynames_tweets %>% 
   ggplot(aes(x=status_id, y = n)) +
   geom_col() +
   facet_wrap(~sex) +
@@ -54,3 +54,16 @@ draft <- joined_babynames_tweets %>%
 dir.create("cleaned_data")
 write_rds(joined_babynames_tweets, "cleaned_data/joined_babynames_hckytweets.rds")
 file.copy("cleaned_data/joined_babynames_hckytweets.rds", "shiny_files/joined_babynames_hckytweets.rds")
+
+
+
+#notes from meeting 
+#how to visualize?
+##tweets by month - over time tweet frequency - by season? fall spring winter
+##alluvial plot
+#raindrop plots (animation)
+#story tab - just raindrop plot that shows story
+#exlpore data tab - DT table, allow person to click sport, date, other stuff 
+
+#how to incorporate statistical modeling into tweet data - frequency of tweets ~ gender? 
+#no stat modeling
