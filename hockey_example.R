@@ -54,11 +54,6 @@ joined_babynames_tweets %>%
   facet_wrap(~sex) +
   coord_flip() +
   theme(axis.text.y=element_blank())
-
-
-#save joined_babynames_tweets as rds
-dir.create("cleaned_data")
-write_rds(joined_babynames_tweets, "cleaned_data/joined_babynames_hckytweets.rds")
         
 
 
