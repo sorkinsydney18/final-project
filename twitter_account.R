@@ -4,8 +4,6 @@ library(tidyverse)
 
 get_token()
 
-ncaa <- c("NCAA", "NCAATrackField", "NCAALAX", "NCAASoccer", "NCAAIceHockey")
-
 ##Create combined tibble of most recent tweets from the listed NCAA affiliate accounts
 
 ncaa <- get_timeline("NCAA", n = 100, parse = TRUE) %>% 
