@@ -12,6 +12,7 @@ library(tidytext)
 library(tidyverse)
 library(stringr)
 library(shiny)
+library(DT)
 library(markdown)
 library(shinythemes)
 
@@ -21,7 +22,7 @@ data("stop_words")
 
 #create variables for ggplot
 joined_babynames_tweets <- read_rds("joined_babynames_hckytweets.rds")
-
+tweets <- read_rds("tweets.rds")
 
 ui <- navbarPage("Project",
                  theme = shinytheme("united"),
@@ -34,9 +35,46 @@ ui <- navbarPage("Project",
            tabPanel("Data",
                     mainPanel(plotOutput("plot")),
                     sidebarPanel()),
-           tabPanel("Explanation"))
+           
+    #############
+    ##EXPLORE###
+    ############
+    
+           tabPanel("Explore",
+                    
+                    fluidPage(
+                      titlePanel("Explore the data"),
+                      
+                      sidebarLayout(
+                        sidebarPanel(
+                          helpText("Pick an NCAA Twitter Account to view recent tweets"),
+                          h3("Tweet Search"),
+                          selectInput("screen_name", NULL,
+                                      choices = tweets$screen_name,
+                                      selected = "@NCAA")),
+                        mainPanel(
+                          DTOutput("word_table"))
+                    
+                    ))))
                      
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
+  ############
+  ##EXPLORE##
+  ###########
+  
+  output$word_table <- renderDT({
+    
+    datatable(tweets %>% filter(screen_name == input$screen_name) %>% select(-screen_name),
+              class = 'display',
+              rownames = FALSE,
+              selection = 'single',
+              colnames = c("Tweet Text", "Date", "Favorites", "Retweets"),
+              options = list(dom = 'tip'))
+  })
+  
+  
+  
   output$plot <- renderPlot({
     joined_babynames_tweets %>% 
       ggplot(aes(x=status_id, y = n)) +
@@ -53,8 +91,6 @@ server <- function(input, output) {
       
 }
 
-        
-                               
-
+      
 # Run the application 
 shinyApp(ui = ui, server = server)

@@ -5,8 +5,8 @@ account: sydney-sorkin
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1392443
-bundleId: 2546015
+bundleId: 2598498
 url: https://sydney-sorkin.shinyapps.io/Shiny_Example/
-when: 1572312864.91078
+when: 1574106629.92885
 asMultiple: FALSE
 asStatic: FALSE
