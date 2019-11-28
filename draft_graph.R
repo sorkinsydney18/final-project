@@ -57,6 +57,11 @@ file.copy("cleaned_data/joined_babynames_hckytweets.rds", "shiny_files/joined_ba
 
 
 
+
+
+
+
+
 #notes from meeting 
 #how to visualize?
 ##tweets by month - over time tweet frequency - by season? fall spring winter
