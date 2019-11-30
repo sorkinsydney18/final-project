@@ -1,6 +1,9 @@
 library(rtweet)
 library(cowplot)
+library(tidytext)
+library(lubridate)
 library(tidyverse)
+source("R_rainclouds.R")
 
 names <- read_rds("cleaned_data/cleaned_names.rds")
 stop_words <- read_rds("cleaned_data/clean_stop_words.rds")
@@ -16,19 +19,28 @@ hockey <- get_timeline("NCAAIceHockey", n = 100) %>%
 joined_names_tweets <- hockey %>% 
   left_join(names, by = c("word" = "name")) %>% 
   drop_na() %>% 
-  select(-year,-prop, -n, -avg_prop) %>% 
+  select(-year,-prop, -word, -n, -avg_prop, -word) %>% 
   group_by(status_id) %>% 
-  add_count(sex)
-  
-  
-
-
+  count(sex) %>% 
+  spread(key = sex, value = n) %>%
   replace_na(list(F = 0, M = 0)) %>% 
-  mutate(tweet_female = ifelse(M == 0, 1,0))
+  mutate(tweet_female = ifelse(M == 0, 1,0)) %>% 
+  mutate(tweet_male = ifelse(tweet_female == 0, 1,0)) %>% 
+  left_join(hockey, by = "status_id") %>% 
+  select(-word) %>% 
+  mutate(sex_id = ifelse(tweet_female == 1, "F", "M")) %>% 
+  mutate(month = month(ymd_hms(created_at), label = TRUE, abbr = TRUE))
+
+
   
+  #line plot - do it by month
+ggplot(joined_names_tweets, aes(x = month, y = tweet_female)) +
+  geom_col()
+  
+
   #raindrop plot copied
 
-  ggplot(joined_names_tweets, aes(x=sex,y=created_at, fill = sex)) +
+  ggplot(joined_names_tweets, aes(x=sex_id,y=created_at)) +
     geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 2) +
     geom_point(position = position_jitter(width = .15), size = .25) +
     ylab('date')+
