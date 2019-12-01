@@ -16,6 +16,7 @@ library(DT)
 library(markdown)
 library(shinythemes)
 
+source("R_rainclouds.R")
 data("babynames")
 data("stop_words")
 
@@ -27,14 +28,22 @@ tweets <- read_rds("tweets.rds")
 ui <- navbarPage("Project",
                  theme = shinytheme("united"),
     
-           tabPanel("About",
-                    fluidRow(
-                        column(8,
-                               includeMarkdown("about.Rmd"))
-                    )),
-           tabPanel("Data",
-                    mainPanel(plotOutput("plot")),
-                    sidebarPanel()),
+     ###########
+     ###DATA###
+     ##########
+ 
+           tabPanel("Graphics",
+                    fluidPage(
+                    tabsetPanel(
+                      tabPanel("Over - Time"),
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("screen_name", "NCAA Twitter Account:",
+                                      choices = joined_names_tweets$screen_name)),
+                        mainPanel(
+                          plotOutput("raincloud"))),
+                    tabPanel("Pie Graph"),
+                    tabPanel("Mentions")),
            
     #############
     ##EXPLORE###
@@ -53,12 +62,36 @@ ui <- navbarPage("Project",
                                       choices = tweets$screen_name,
                                       selected = "@NCAA")),
                         mainPanel(
-                          DTOutput("word_table"))
-                    
-                    ))))
+                          DTOutput("word_table")),
+    ##########
+    ##ABOUT##
+    #########
+                    tabPanel("About",
+                    fluidRow(
+                        column(8,
+                               includeMarkdown("about.Rmd"))))))))))
                      
 server <- function(input, output, session) {
+ 
+  ########
+  ##DATA##
+  ########
   
+  output$raincloud <- renderPlot({
+  
+    ggplot(joined_babynames_tweets %>% filter(screen_name == input$screen_name), 
+           aes(x=sex_id,y=created_at, fill = sex_id)) +
+      geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
+      geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
+      ylab('Date')+
+      xlab('Gender')+
+      coord_flip()+
+      theme_cowplot()+
+      guides(fill = FALSE) +
+      scale_fill_manual(values = c("snow1", "steelblue"))
+  })
+  
+
   ############
   ##EXPLORE##
   ###########
@@ -71,22 +104,6 @@ server <- function(input, output, session) {
               selection = 'single',
               colnames = c("Tweet Text", "Date", "Favorites", "Retweets"),
               options = list(dom = 'tip'))
-  })
-  
-  
-  
-  output$plot <- renderPlot({
-    joined_babynames_tweets %>% 
-      ggplot(aes(x=status_id, y = n)) +
-      geom_col() +
-      facet_wrap(~sex) +
-      coord_flip() +
-      theme(axis.text.y=element_blank()) +
-      labs(title = "Gender Mentions in Last 100 Tweets of @NCAAIceHockey",
-           subtitle = "Male names are favored",
-           caption = "Gender assumed by names mentioned in individual Tweet",
-           y = "Count of names mentioned per Tweet",
-           x = "Distinct Tweets")
   })
       
 }

@@ -2,13 +2,14 @@ library(rtweet)
 library(cowplot)
 library(tidytext)
 library(lubridate)
+library(gganimate)
 library(tidyverse)
 source("R_rainclouds.R")
 
 names <- read_rds("cleaned_data/cleaned_names.rds")
 stop_words <- read_rds("cleaned_data/clean_stop_words.rds")
 
-hockey <- get_timeline("NCAAIceHockey", n = 100) %>% 
+hockey <- get_timeline("NCAAIceHockey", n = 1000) %>% 
   mutate(stripped_text = gsub("http.*","", text)) %>% 
   mutate(stripped_text = gsub("https.*", "", stripped_text)) %>% 
   select(status_id, created_at, stripped_text) %>% 
@@ -34,19 +35,20 @@ joined_names_tweets <- hockey %>%
 
   
   #line plot - do it by month
-ggplot(joined_names_tweets, aes(x = month, y = tweet_female)) +
-  geom_col()
+ggplot(joined_names_tweets, aes( x = tweet_female)) +
+  geom_density()
   
 
   #raindrop plot copied
 
-  ggplot(joined_names_tweets, aes(x=sex_id,y=created_at)) +
-    geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 2) +
-    geom_point(position = position_jitter(width = .15), size = .25) +
-    ylab('date')+
-    xlab('sex')+
+  ggplot(joined_names_tweets, aes(x=sex_id,y=created_at, fill = sex_id)) +
+    geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
+    geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
+    ylab('Month')+
+    xlab('Gender')+
     coord_flip()+
     theme_cowplot()+
-    guides(fill = FALSE)
+    guides(fill = FALSE) +
+    scale_fill_manual(values = c("snow1", "steelblue"))
   
 
