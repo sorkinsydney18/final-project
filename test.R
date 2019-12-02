@@ -70,7 +70,7 @@ file.copy("cleaned_data/raincloud.rds", "shiny_files/raincloud.rds")
 #########################
 #UNFILTERED RAINCLOUD PLOT 
 
-ggplot(raincloud, aes(x=sex_id,y=created_at, fill = sex_id)) +
+ggplot(raincloud, aes(x=sex_id,y=created_at, fill = screen_name, alpha = .5)) +
   geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
   geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
   ylab('Date')+
@@ -78,7 +78,11 @@ ggplot(raincloud, aes(x=sex_id,y=created_at, fill = sex_id)) +
   coord_flip()+
   theme_cowplot()+
   guides(fill = FALSE) +
-  scale_fill_manual(values = c("snow1", "steelblue"))
+  scale_y_datetime(limits = as.POSIXct(c("2019-04-01", "2019-12-01")))
+  
+  
+  #scale_fill_manual(values = c("snow1", "steelblue")) +
+  #cale_color_brewer("Accounts")
 
 
 ##################

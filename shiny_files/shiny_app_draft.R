@@ -41,6 +41,14 @@ ui <- navbarPage("Project",
                                
                                br(),
                                
+                               h4("Full Sample"),
+                               
+                               br(),
+                               
+                               plotOutput("full_raincloud"),
+                               
+                               br(),
+                               
                               sidebarPanel(
                                  selectInput("screen_name", "NCAA Twitter Accounts:",
                                              choices = raincloud$screen_name,
@@ -92,6 +100,22 @@ server <- function(input, output, session) {
   ########
   ##DATA##
   ########
+  
+  output$full_raincloud <- renderPlot({
+    
+    ggplot(raincloud, aes(x=sex_id,y=created_at, fill = screen_name)) +
+      geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
+      geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
+      ylab('Date')+
+      xlab('Gender')+
+      coord_flip()+
+      theme_cowplot()+
+      guides(fill = FALSE)
+      #scale_fill_manual(values = c("snow1", "steelblue")) +
+      #scale_color_brewer("Accounts")
+    
+  })
+  
   
   output$raincloud <- renderPlot({
     
