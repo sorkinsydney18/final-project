@@ -35,11 +35,12 @@ joined_names_tweets <- cleaned_tweet_timeline %>%
 
 write_rds(joined_names_tweets, "cleaned_data/joined_names_tweets.rds") 
 file.copy("cleaned_data/joined_names_tweets.rds", "shiny_files/joined_names_tweets.rds", overwrite = TRUE)
- 
 
-#data used for raincloud plots
+############################# 
+#clean data for raincloud plots
 
 raincloud <- joined_names_tweets %>%  
+  
   #drop values that are not matched with names in babynames dataset
   
   drop_na() %>% 
@@ -58,13 +59,16 @@ raincloud <- joined_names_tweets %>%
   mutate(tweet_female = ifelse(M == 0, 1,0)) %>% 
   mutate(sex_id = ifelse(tweet_female == 1, "F", "M")) %>% 
   
-  #I rejoined the original dataset to include the data variable
+  #I rejoined the original dataset to include the date variable
   
   left_join(cleaned_tweet_timeline, by = "status_id") %>% 
   select(-word)
 
 write_rds(raincloud, "cleaned_data/raincloud.rds")
 file.copy("cleaned_data/raincloud.rds", "shiny_files/raincloud.rds")
+
+#########################
+#UNFILTERED RAINCLOUD PLOT 
 
 ggplot(raincloud, aes(x=sex_id,y=created_at, fill = sex_id)) +
   geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
@@ -77,28 +81,43 @@ ggplot(raincloud, aes(x=sex_id,y=created_at, fill = sex_id)) +
   scale_fill_manual(values = c("snow1", "steelblue"))
 
 
-
-###### pie chart cleaning
+##################
+#pie chart cleaning
 
 pie_chart <- joined_names_tweets %>% 
   group_by(status_id) %>%
   count(sex) %>% 
   spread(key = sex, value = n) %>%
-  left_join(cleaned_tweet_timeline, by = "status_id") %>% 
+  left_join(joined_names_tweets, by = "status_id") %>% 
   select(-word) %>%
   replace_na(list(F = 0, M = 0)) %>% 
+  
+  #This variable labels each individual tweet as either a Female, Male, or Neither - this is similar
+  #to the coding from above, but this time I kept tweets that are neither purely male or female 
+  #to get a whole sense of each account's tweeting tendencies
+  
   mutate(tweet_id = case_when(M == F ~ "Neither",
                               F == 0 ~ "Male",
                               M == 0 ~ "Female",
                               TRUE ~ "Neither")) %>% 
-  #mutate(perc = ) ADD PERCENTS
+  group_by(screen_name) %>% 
+  count(tweet_id) %>% 
+  mutate(prop = n/sum(n)) 
 
-  ggplot(pie_chart, aes(x = "", fill = tweet_id)) +
-    geom_bar(width = 1) +
+#Pie chart format 
+
+pie_chart %>%
+  filter(screen_name == "NCAA") %>% 
+
+  ggplot(aes(x = "", y = prop, fill = tweet_id)) +
+    geom_bar(width = 1, stat = "identity") +
     coord_polar("y", start = 0) +
-    scale_fill_brewer("Blues") +
+    scale_fill_brewer("") +
     theme(axis.text.x=element_blank()) +
-    theme_void() 
+    theme_void() +
+  geom_text(aes(label = percent(prop, accuracy = .1)), 
+            position = position_stack(vjust = 0.5), 
+            color = "gray18")
     
    
   

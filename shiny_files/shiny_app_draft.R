@@ -12,6 +12,7 @@ library(tidytext)
 library(tidyverse)
 library(stringr)
 library(shiny)
+library(cowplot)
 library(DT)
 library(markdown)
 library(shinythemes)
@@ -34,12 +35,30 @@ ui <- navbarPage("Project",
  
            tabPanel("Graphics",
                     tabsetPanel(
-                      tabPanel("Over Time",
+                      tabPanel("Frequency",
+                               
+                               h3("When is the NCAA tweeting the most? And about who?"),
+                               
+                               br(),
+                               
+                              sidebarPanel(
+                                 selectInput("screen_name", "NCAA Twitter Accounts:",
+                                             choices = raincloud$screen_name,
+                                             selected = "NCAA")),
+                               
+                               mainPanel(plotOutput("raincloud"))),
+                      
+                      tabPanel("Content",
+                               
+                               h3("How often is the NCAA tweeting about Men or Women? A look at tweet distributions"),
+                               
+                               br(),
+                               
                                sidebarPanel(
                                  selectInput("screen_name", "NCAA Twitter Accounts:",
-                                             choices = raincloud$screen_name),
-                                 mainPanel(plotOutput("raincloud")))),
-                      tabPanel("Stuff"))),
+                                             choices = joined_names_tweets$screen_name)),
+                               
+                               mainPanel(plotOutput("pie_chart"))))),
                     
     #############
     ##EXPLORE###
@@ -58,14 +77,15 @@ ui <- navbarPage("Project",
                                       choices = tweets$screen_name,
                                       selected = "@NCAA")),
                         mainPanel(
-                          DTOutput("word_table")),
-    ##########
+                          DTOutput("word_table"))))),
+    #########
     ##ABOUT##
     #########
-                    tabPanel("About",
+    
+    tabPanel("About",
                     fluidRow(
                         column(8,
-                               includeMarkdown("about.Rmd"))))))))
+                               includeMarkdown("about.Rmd")))))
                      
 server <- function(input, output, session) {
  
@@ -89,7 +109,39 @@ server <- function(input, output, session) {
       scale_fill_manual(values = c("snow1", "steelblue"))
   })
   
-
+output$pie_chart <- renderPlot({
+  
+  
+ joined_names_tweets %>% 
+    group_by(status_id) %>%
+    count(sex) %>% 
+    spread(key = sex, value = n) %>%
+    left_join(joined_names_tweets, by = "status_id") %>% 
+    select(-word) %>%
+    replace_na(list(F = 0, M = 0)) %>% 
+    mutate(tweet_id = case_when(M == F ~ "Neither",
+                                F == 0 ~ "Male",
+                                M == 0 ~ "Female",
+                                TRUE ~ "Neither")) %>% 
+    group_by(screen_name) %>% 
+    count(tweet_id) %>% 
+    mutate(prop = n/sum(n)) %>% 
+    filter(screen_name == input$screen_name) %>% 
+    
+    ggplot(aes(x = "", y = prop, fill = tweet_id)) +
+    geom_bar(width = 1, stat = "identity") +
+    coord_polar("y", start = 0) +
+    scale_fill_brewer("") +
+    theme(axis.text.x=element_blank()) +
+    theme_void() +
+    geom_text(aes(label = percent(prop, accuracy = .1)), 
+              position = position_stack(vjust = 0.5), 
+              color = "gray18")
+  
+})
+  
+  
+  
   ############
   ##EXPLORE##
   ###########
