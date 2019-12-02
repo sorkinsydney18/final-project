@@ -1,6 +1,7 @@
 library(rtweet)
 library(cowplot)
 library(tidytext)
+library(scales)
 library(tidyverse)
 source("R_rainclouds.R")
 get_token()
@@ -80,6 +81,26 @@ ggplot(raincloud, aes(x=sex_id,y=created_at, fill = sex_id)) +
 ###### pie chart cleaning
 
 pie_chart <- joined_names_tweets %>% 
-  group_by(screen_name) %>% 
-  count(sex)
+  group_by(status_id) %>%
+  count(sex) %>% 
+  spread(key = sex, value = n) %>%
+  left_join(cleaned_tweet_timeline, by = "status_id") %>% 
+  select(-word) %>%
+  replace_na(list(F = 0, M = 0)) %>% 
+  mutate(tweet_id = case_when(M == F ~ "Neither",
+                              F == 0 ~ "Male",
+                              M == 0 ~ "Female",
+                              TRUE ~ "Neither")) %>% 
+  #mutate(perc = ) ADD PERCENTS
+
+  ggplot(pie_chart, aes(x = "", fill = tweet_id)) +
+    geom_bar(width = 1) +
+    coord_polar("y", start = 0) +
+    scale_fill_brewer("Blues") +
+    theme(axis.text.x=element_blank()) +
+    theme_void() 
+    
+   
+  
+         
   
