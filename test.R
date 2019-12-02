@@ -28,8 +28,17 @@ cleaned_tweet_timeline <- tweet_timeline %>%
 #join babynames set with cleaned tweets
 
 joined_names_tweets <- cleaned_tweet_timeline %>% 
-  left_join(names, by = c("word" = "name")) %>% 
-  
+  left_join(names, by = c("word" = "name")) 
+
+#save data for pie charts 
+
+write_rds(joined_names_tweets, "cleaned_data/joined_names_tweets.rds") 
+file.copy("cleaned_data/joined_names_tweets.rds", "shiny_files/joined_names_tweets.rds", overwrite = TRUE)
+ 
+
+#data used for raincloud plots
+
+raincloud <- joined_names_tweets %>%  
   #drop values that are not matched with names in babynames dataset
   
   drop_na() %>% 
@@ -53,10 +62,10 @@ joined_names_tweets <- cleaned_tweet_timeline %>%
   left_join(cleaned_tweet_timeline, by = "status_id") %>% 
   select(-word)
 
-write_rds(joined_names_tweets, "cleaned_data/joined_names_tweets.rds") 
-file.copy("cleaned_data/joined_names_tweets.rds", "shiny_files/joined_names_tweets.rds", overwrite = TRUE)
+write_rds(raincloud, "cleaned_data/raincloud.rds")
+file.copy("cleaned_data/raincloud.rds", "shiny_files/raincloud.rds")
 
-ggplot(joined_names_tweets, aes(x=sex_id,y=created_at, fill = sex_id)) +
+ggplot(raincloud, aes(x=sex_id,y=created_at, fill = sex_id)) +
   geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
   geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
   ylab('Date')+
@@ -65,4 +74,12 @@ ggplot(joined_names_tweets, aes(x=sex_id,y=created_at, fill = sex_id)) +
   theme_cowplot()+
   guides(fill = FALSE) +
   scale_fill_manual(values = c("snow1", "steelblue"))
+
+
+
+###### pie chart cleaning
+
+pie_chart <- joined_names_tweets %>% 
+  group_by(screen_name) %>% 
+  count(sex)
   

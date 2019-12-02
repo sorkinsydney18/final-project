@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-library(babynames)
+
 library(rtweet)
 library(tidytext)
 library(tidyverse)
@@ -17,13 +17,13 @@ library(markdown)
 library(shinythemes)
 
 source("R_rainclouds.R")
-data("babynames")
-data("stop_words")
 
 
 #create variables for ggplot
-joined_babynames_tweets <- read_rds("joined_babynames_hckytweets.rds")
+joined_names_tweets <- read_rds("joined_names_tweets.rds")
 tweets <- read_rds("tweets.rds")
+raincloud <- read_rds("raincloud.rds")
+
 
 ui <- navbarPage("Project",
                  theme = shinytheme("united"),
@@ -33,18 +33,14 @@ ui <- navbarPage("Project",
      ##########
  
            tabPanel("Graphics",
-                    fluidPage(
                     tabsetPanel(
-                      tabPanel("Over - Time"),
-                      sidebarLayout(
-                        sidebarPanel(
-                          selectInput("screen_name", "NCAA Twitter Account:",
-                                      choices = joined_names_tweets$screen_name)),
-                        mainPanel(
-                          plotOutput("raincloud"))),
-                    tabPanel("Pie Graph"),
-                    tabPanel("Mentions")),
-           
+                      tabPanel("Over Time",
+                               sidebarPanel(
+                                 selectInput("screen_name", "NCAA Twitter Accounts:",
+                                             choices = raincloud$screen_name),
+                                 mainPanel(plotOutput("raincloud")))),
+                      tabPanel("Stuff"))),
+                    
     #############
     ##EXPLORE###
     ############
@@ -69,7 +65,7 @@ ui <- navbarPage("Project",
                     tabPanel("About",
                     fluidRow(
                         column(8,
-                               includeMarkdown("about.Rmd"))))))))))
+                               includeMarkdown("about.Rmd"))))))))
                      
 server <- function(input, output, session) {
  
@@ -78,9 +74,11 @@ server <- function(input, output, session) {
   ########
   
   output$raincloud <- renderPlot({
-  
-    ggplot(joined_babynames_tweets %>% filter(screen_name == input$screen_name), 
-           aes(x=sex_id,y=created_at, fill = sex_id)) +
+    
+    raincloud %>%
+      filter(screen_name == input$screen_name) %>% 
+      
+      ggplot(aes(x=sex_id,y=created_at, fill = sex_id)) +
       geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
       geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
       ylab('Date')+
