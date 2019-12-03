@@ -29,7 +29,8 @@ cleaned_tweet_timeline <- tweet_timeline %>%
 #join babynames set with cleaned tweets
 
 joined_names_tweets <- cleaned_tweet_timeline %>% 
-  left_join(names, by = c("word" = "name")) 
+  left_join(names, by = c("word" = "name")) %>% 
+  mutate(account_names1 = screen_name)
 
 #save data for pie charts 
 
@@ -62,21 +63,22 @@ raincloud <- joined_names_tweets %>%
   #I rejoined the original dataset to include the date variable
   
   left_join(cleaned_tweet_timeline, by = "status_id") %>% 
-  select(-word)
+  select(-word) %>% 
+  mutate(account_name = screen_name)
 
 write_rds(raincloud, "cleaned_data/raincloud.rds")
-file.copy("cleaned_data/raincloud.rds", "shiny_files/raincloud.rds")
+file.copy("cleaned_data/raincloud.rds", "shiny_files/raincloud.rds", overwrite = TRUE)
 
 #########################
 #UNFILTERED RAINCLOUD PLOT 
 
 ggplot(raincloud, aes(x=sex_id,y=created_at, fill = screen_name, alpha = .5)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4) +
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4,scale="count") +
   geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
   ylab('Date')+
   xlab('Gender')+
   coord_flip()+
-  theme_cowplot()+
+  theme_cowplot()
   guides(fill = FALSE) +
   scale_y_datetime(limits = as.POSIXct(c("2019-04-01", "2019-12-01")))
   
@@ -104,7 +106,8 @@ pie_chart <- joined_names_tweets %>%
                               F == 0 ~ "Male",
                               M == 0 ~ "Female",
                               TRUE ~ "Neither")) %>% 
-  group_by(screen_name) %>% 
+    mutate(account_names1 = screen_name) %>% 
+  group_by(account_names1) %>% 
   count(tweet_id) %>% 
   mutate(prop = n/sum(n)) 
 
