@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
   
-## Purpose
+##Purpose
   
 This project seeks to do a comprehensive review of Harvard University's efforts to publicize its men's and women's varsity sports teams via various official Harvard affiliated Twitter accounts in the 2018-2019 academic year. The research is centered around the questions: Does Harvard provide equal media coverage its men's and women's sports teams? If not, which teams are favored? Are those teams favored due to a gender bias or greater team success than others? 
   
