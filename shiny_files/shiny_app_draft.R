@@ -14,6 +14,8 @@ library(stringr)
 library(shiny)
 library(cowplot)
 library(DT)
+library(wesanderson)
+library(scales)
 library(markdown)
 library(shinythemes)
 
@@ -43,7 +45,7 @@ ui <- navbarPage("NCAA on Twitter",
                           #title and subtitle
                           
                           h2("Does the NCAA promote its Men's and Women's teams differently?", align = "center"),
-                          h4(em("An Analysis of how the NCAA uses Twitter to promote teams and athletes"), align = "center"),
+                          h4(em("An analysis of how the NCAA uses Twitter to promote teams and athletes"), align = "center"),
                           br(),
                           div(),
                           
@@ -106,7 +108,7 @@ ui <- navbarPage("NCAA on Twitter",
  
                                br(),
                                
-                               h4("subtitle explaining main graph"),
+                               h4("Distribution of Tweets from All Accounts"),
                                
                                plotOutput("full_raincloud"),
                                
@@ -177,6 +179,12 @@ ui <- navbarPage("NCAA on Twitter",
                         mainPanel(
                           DTOutput("word_table"))))),
     
+    
+    #############
+    ##FOOTNOTES##
+    #############
+    
+    
     #tab to explain where I got my data and reference resources used
     
     tabPanel("Footnotes",
@@ -189,8 +197,10 @@ ui <- navbarPage("NCAA on Twitter",
              p("I used name data from the babynames package. This is a collection of names from Social Security
                data."),
              p("I used the the geom_flat_violin function to create my raincoud plots. I used the raincloud script
-               built by Allen Poggiali and Kristen Whitaker. More about raincloud plots at ther github found here:
-               https://github.com/RainCloudPlots/RainCloudPlots"),
+               built by Allen Poggiali and Kristen Whitaker. More about raincloud plots at ther github found ", 
+               a(href = "https://github.com/RainCloudPlots/RainCloudPlots", "here.")),
+             
+          
              br(),
              
              h3("Contact Me"),
@@ -198,7 +208,9 @@ ui <- navbarPage("NCAA on Twitter",
              p("My name is Sydney Sorkin and I am an undgraduate at Harvard. I'm majoring in Government with a
                minor in Psychology. I'm interested in applying data science to explain different facets of human
                nature, especially as it relates to American politics and sports (namely hockey!). Email me at
-               ssorkin@college.harvard.edu. The code for this project can be found here: ")))
+               ssorkin@college.harvard.edu. The code for this project can be found ", 
+               a(href = "https://github.com/sorkinsydney18/final-project", "here."))))
+
                      
 server <- function(input, output, session) {
  
