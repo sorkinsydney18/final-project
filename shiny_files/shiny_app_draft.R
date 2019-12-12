@@ -62,8 +62,8 @@ ui <- navbarPage("NCAA on Twitter",
                                           p("The purpose of the project is to analyze and display how different NCAA Twitter accounts use their platform to relay news to followers. This project is tasked with answering the question of 
                                                        whether there is an imbalance of tweets dedicated to Men's or Women's team and athletes.
                                                        Women's sports have been historically underrepresented in the media in turn damaging the
-                                                       visibilty and growth of the women's game. Recent campaigns from top-tier brands like Nike or
-                                                       Addidas have recognized the imbalance of media coverage and sought to equalize. Twitter 
+                                                       visibility and growth of the women's game. Recent campaigns from top-tier brands like Nike or
+                                                       Adidas have recognized the imbalance of media coverage and sought to equalize. Twitter 
                                                        represents just one platform in which the NCAA can promote its sports teams. Is there a 
                                                        difference for how the NCAA reports Men's and Women's teams? If so, does this highlight a
                                                        larger gender bias?"),
@@ -77,7 +77,7 @@ ui <- navbarPage("NCAA on Twitter",
                                           
                                           
                                           p("I chose to analyze Division I NCAA Twitter accounts that included both Men's and Women's 
-                                            coverage as some sports have seperate Twitters for the men and women divisions. I chose 
+                                            coverage as some sports have separate Twitters for the men and women divisions. I chose 
                                             these five sports and their Twitter accounts: Ice Hockey (@NCAAIceHockey), Track and Field
                                             (@NCAATrackField), Lacrosse (@NCAALAX), Soccer (@NCAASoccer), and the general NCAA account 
                                             (@NCAA). Most sports are covered by the general NCAA account."),
