@@ -59,7 +59,7 @@ ui <- navbarPage("NCAA on Twitter",
                                                      
                                           #text to introduce project
                                           
-                                          p("The purpose of the project is to analyze and display how different NCAA Twitter accounts use their platform relay news to followers. This project is tasked with answering the question of 
+                                          p("The purpose of the project is to analyze and display how different NCAA Twitter accounts use their platform to relay news to followers. This project is tasked with answering the question of 
                                                        whether there is an imbalance of tweets dedicated to Men's or Women's team and athletes.
                                                        Women's sports have been historically underrepresented in the media in turn damaging the
                                                        visibilty and growth of the women's game. Recent campaigns from top-tier brands like Nike or
@@ -110,6 +110,8 @@ ui <- navbarPage("NCAA on Twitter",
                                
                                h4("Distribution of Tweets from All Accounts"),
                                
+                               #this is the raincloud of all five accounts at top of page
+                               
                                plotOutput("full_raincloud"),
                                
                                br(),
@@ -118,6 +120,8 @@ ui <- navbarPage("NCAA on Twitter",
                                br(),
                                
                                h4("Is there a difference in Twitter activity between accounts?"),
+                               
+                               #side panel that lets you choose specific account raincloud plots
                                
                               sidebarPanel(
                                 helpText("Choose an account to get a closer look at the division of tweets by gender"),
@@ -131,6 +135,8 @@ ui <- navbarPage("NCAA on Twitter",
                                
                                mainPanel(plotOutput("raincloud"))),
                       
+                      #this tab shows pie chart data
+                      
                       tabPanel("Content",
                                
                                h3("What percentage of tweets are devoted to Females or Males?"),
@@ -138,6 +144,8 @@ ui <- navbarPage("NCAA on Twitter",
                                br(),
                                
                                h4("Different Accounts show an imbalance of gendered tweets"),
+                               
+                               #side panel lets you choose specific account pie chart
                                
                                sidebarPanel(
                                  helpText("Choose an account to get a full picture of the percentage of tweets each account devotes
@@ -218,6 +226,8 @@ server <- function(input, output, session) {
   ##ABOUT##
   ########
   
+  #output ncaa logo on first page
+  
   output$ncaa_logo <- renderImage({
     
     list(src = 'www./ncaa_sports.png',
@@ -232,27 +242,45 @@ server <- function(input, output, session) {
   ##DATA##
   ########
   
+  #full raincloud output of all five accounts
+  
   output$full_raincloud <- renderPlot({
     
     ggplot(raincloud, aes(x=sex_id,y=created_at, fill = screen_name, alpha = .5)) +
+      
+      #scaled to "count"
+      
       geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4,scale="count") +
       geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
       ylab('Date')+
       xlab('Gender')+
       coord_flip()+
       theme_cowplot() +
+      
+      #used wes anderson palette for aesthetics
+      
       scale_fill_manual("Accounts", values = wes_palette("Darjeeling2")) +
+      
+      #turn alpha legend off
+      
       guides(alpha = FALSE) +
+      
+      #scaled dates to within 2019
+      
       scale_y_datetime(limits = as.POSIXct(c("2019-01-01", "2019-12-01")))
 
   })
   
   
   #raincloud plot with reactive data
+  #same output as above but filtered by account
   
   output$raincloud <- renderPlot({
       
     raincloud %>% 
+      
+      #input filters by account
+      
       filter(account_name == input$account_name) %>% 
       ggplot(aes(x=sex_id ,y=created_at, fill = sex_id)) +
       geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4, scale = "count") +
@@ -269,23 +297,41 @@ server <- function(input, output, session) {
   
 output$pie_chart <- renderPlot({
   
+  
+  #clean pie chart data
+  
   pie_chart_reac <- 
     
     joined_names_tweets %>% 
     group_by(status_id) %>%
+    
+    #count mentions of sex by tweet
+    
     count(sex) %>% 
     spread(key = sex, value = n) %>%
     left_join(joined_names_tweets, by = "status_id") %>% 
     select(-word) %>%
+    
+    #create variable to account for male only, female only, and neutral tweets
+    
     replace_na(list(F = 0, M = 0)) %>% 
     mutate(tweet_id = case_when(M == F ~ "Neither",
                                 F == 0 ~ "Male",
                                 M == 0 ~ "Female",
                                 TRUE ~ "Neither")) %>%
-    mutate(account_names1 = screen_name) %>% 
+    mutate(account_names1 = screen_name) %>%
     group_by(account_names1) %>% 
+    
+    #count the mentions of the labeled variable 
+    
     count(tweet_id) %>% 
+    
+    #proportion variable 
+    
     mutate(prop = n/sum(n)) %>% 
+    
+    #input filters by account
+    
     filter(account_names1 == input$account_names1) 
   
   
@@ -295,6 +341,9 @@ output$pie_chart <- renderPlot({
     scale_fill_brewer("") +
     theme(axis.text.x=element_blank()) +
     theme_void() +
+      
+      #shows percentages on pie chart
+      
     geom_text(aes(label = percent(prop, accuracy = .1)), 
               position = position_stack(vjust = 0.5), 
               color = "gray18")
@@ -306,9 +355,14 @@ output$pie_chart <- renderPlot({
   ##EXPLORE##
   ###########
   
+#data table that shows tweets of each account
+
   output$word_table <- renderDT({
     
     tweets_reac <- tweets %>% 
+      
+      #input filters by account
+      
       filter(screen_name == input$screen_name) %>% 
       select(-screen_name)
     
