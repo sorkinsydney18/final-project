@@ -72,19 +72,24 @@ file.copy("cleaned_data/raincloud.rds", "shiny_files/raincloud.rds", overwrite =
 #########################
 #UNFILTERED RAINCLOUD PLOT 
 
+#raincloud code from R_rainclouds.R script
+
 ggplot(raincloud, aes(x=sex_id,y=created_at, fill = screen_name, alpha = .5)) +
-  geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4,scale="count") +
+  
+  #scaled violin plot to "count" metric
+  
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),adjust = 4, scale= "count") +
   geom_point(position = position_jitter(width = .15), size = .25, alpha = .5) +
   ylab('Date')+
   xlab('Gender')+
   coord_flip()+
   theme_cowplot()
   guides(fill = FALSE) +
+    
+    #scaled timeline for aesthetic purposes
+    
   scale_y_datetime(limits = as.POSIXct(c("2019-04-01", "2019-12-01")))
-  
-  
-  #scale_fill_manual(values = c("snow1", "steelblue")) +
-  #cale_color_brewer("Accounts")
+
 
 
 ##################
@@ -92,6 +97,9 @@ ggplot(raincloud, aes(x=sex_id,y=created_at, fill = screen_name, alpha = .5)) +
 
 pie_chart <- joined_names_tweets %>% 
   group_by(status_id) %>%
+    
+    #count mentions of sex by tweet
+    
   count(sex) %>% 
   spread(key = sex, value = n) %>%
   left_join(joined_names_tweets, by = "status_id") %>% 
@@ -114,9 +122,8 @@ pie_chart <- joined_names_tweets %>%
 #Pie chart format 
 
 pie_chart %>%
-  filter(screen_name == "NCAA") %>% 
-
   ggplot(aes(x = "", y = prop, fill = tweet_id)) +
+  facet_wrap(~account_names1) +
     geom_bar(width = 1, stat = "identity") +
     coord_polar("y", start = 0) +
     scale_fill_brewer("") +

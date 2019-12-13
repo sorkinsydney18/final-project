@@ -230,7 +230,7 @@ server <- function(input, output, session) {
   
   output$ncaa_logo <- renderImage({
     
-    list(src = 'www./ncaa_sports.png',
+    list(src = 'www/ncaa_sports.png',
          height = 300,
          width = 700,
          style = "display: block; margin-left: auto; margin-right: auto;")},
