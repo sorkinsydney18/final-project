@@ -16,7 +16,7 @@ library(cowplot)
 library(DT)
 library(wesanderson)
 library(scales)
-library(markdown)
+library(vembedr)
 library(shinythemes)
 
 source("R_rainclouds.R")
@@ -196,6 +196,8 @@ ui <- navbarPage("NCAA on Twitter",
     #tab to explain where I got my data and reference resources used
     
     tabPanel("Footnotes",
+             
+             embed_url("https://www.youtube.com/watch?v=nVPIrCiQofk&feature=youtu.be"),
              
              h3("References"),
              br(),
